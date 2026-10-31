@@ -1,0 +1,464 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+:root {
+  --green: #294633;
+  --green-dark: #1f3527;
+  --cream: #f6f4ee;
+  --ink: #27362b;
+  --muted: #81877e;
+  --line: #e9e7df;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 250px;
+  height: 100vh;
+  background: var(--green-dark);
+  padding: 20px 18px 10px;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  z-index: 10;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  padding: 0 10px 20px;
+  flex-shrink: 0;
+}
+
+.brand-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: #d9c19b;
+  color: var(--green-dark);
+  font-size: 21px;
+  flex-shrink: 0;
+}
+
+.brand strong {
+  display: block;
+  font: 700 21px 'Playfair Display', serif;
+}
+
+.brand small {
+  display: block;
+  color: #b9c8b8;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  margin-top: 3px;
+}
+
+.nav-label {
+  padding: 7px 12px;
+  color: #9eb09f;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+.sidebar .nav-link {
+  color: #c8d3c7;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 9px 14px;
+  border-radius: 9px;
+  margin: 2px 0;
+  font-size: 13px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.sidebar .nav-link i {
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background: #ffffff16;
+  color: #fff;
+}
+
+.sidebar .nav-link.active {
+  box-shadow: inset 3px 0 #d9c19b;
+}
+
+.sidebar .nav-label.mt-4 {
+  margin-top: 12px !important;
+}
+
+/* PROFIL PENGGUNA DAN LOGOUT */
+.sidebar-bottom {
+  margin-top: auto;
+  border-top: 1px solid #ffffff1a;
+  padding-top: 10px;
+  padding-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #d9c19b;
+  color: var(--green-dark);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-info {
+  min-width: 0;
+}
+
+.user-info strong,
+.user-info small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 145px;
+}
+
+.user-info strong {
+  font-size: 12px;
+}
+
+.user-info small {
+  color: #aab9aa;
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.sidebar .logout-link {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 12px !important;
+  margin-top: 4px !important;
+  border-radius: 9px;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sidebar .logout-link:hover {
+  background: #ffffff20;
+  color: #ffffff !important;
+}
+
+.sidebar .logout-link i {
+  display: inline-block !important;
+  font-size: 17px !important;
+}
+
+/* AREA KONTEN */
+.main-content {
+  margin-left: 250px;
+  padding: 30px 34px 40px;
+  min-width: 0;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.topbar-kicker {
+  color: #92978c;
+  font-size: 10px;
+  letter-spacing: 1.7px;
+  font-weight: 700;
+}
+
+.topbar h1 {
+  font: 700 30px 'Playfair Display', serif;
+  margin: 7px 0 0;
+}
+
+.topbar-date {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 12px;
+  color: #697366;
+  flex-shrink: 0;
+}
+
+.page-subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: -20px;
+  margin-bottom: 25px;
+}
+
+/* KARTU DASHBOARD */
+.stat-card,
+.panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  padding: 21px;
+  height: 100%;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stat-value {
+  font-size: clamp(20px, 2vw, 27px);
+  font-weight: 700;
+  margin-top: 12px;
+  letter-spacing: -.7px;
+  overflow-wrap: anywhere;
+}
+
+.stat-note {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 8px;
+}
+
+.stat-icon {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  border-radius: 11px;
+  background: #edf2eb;
+  color: var(--green);
+  font-size: 19px;
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.panel-subtitle {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* TABEL */
+.table {
+  --bs-table-bg: transparent;
+}
+
+.table th {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  border-bottom-color: var(--line);
+  padding: 13px 10px;
+}
+
+.table td {
+  font-size: 12px;
+  vertical-align: middle;
+  padding: 14px 10px;
+  border-bottom-color: #f0eee8;
+}
+
+.badge-soft {
+  background: #eaf2e9;
+  color: #31553a;
+  font-weight: 600;
+  padding: 6px 9px;
+}
+
+/* TOMBOL */
+.btn-brand {
+  background: var(--green);
+  color: white;
+  border-radius: 9px;
+  padding: 11px 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn-brand:hover {
+  background: var(--green-dark);
+  color: white;
+}
+
+/* AKSI CEPAT */
+.quick-action {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.quick-action:hover {
+  border-color: #9eae9c;
+  background: #fafbf8;
+  color: var(--ink);
+}
+
+.quick-action i {
+  color: var(--green);
+  font-size: 21px;
+  flex-shrink: 0;
+}
+
+.quick-action strong {
+  display: block;
+  font-size: 12px;
+}
+
+.quick-action small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+/* LAYAR MENENGAH DAN KECIL */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 76px;
+    padding: 18px 8px 8px;
+  }
+
+  .brand {
+    justify-content: center;
+    padding: 0 0 22px;
+  }
+
+  .brand > span:last-child,
+  .nav-label {
+    display: none;
+  }
+
+  .sidebar .nav-link:not(.logout-link) {
+    justify-content: center;
+    padding: 12px 6px;
+    font-size: 0;
+  }
+
+  .sidebar .nav-link i {
+    font-size: 19px;
+  }
+
+  .sidebar .nav-label.mt-4 {
+    margin-top: 8px !important;
+  }
+
+  .sidebar-bottom {
+    padding-top: 10px;
+  }
+
+  .user-chip {
+    justify-content: center;
+    padding: 4px 0;
+  }
+
+  .sidebar-bottom .user-info {
+    display: none;
+  }
+
+  .sidebar .logout-link {
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 7px 2px !important;
+    font-size: 10px !important;
+    white-space: normal;
+  }
+
+  .sidebar .logout-link i {
+    font-size: 18px !important;
+  }
+
+  .main-content {
+    margin-left: 76px;
+    padding: 24px 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .topbar h1 {
+    font-size: 25px;
+  }
+
+  .topbar-date {
+    padding: 9px 11px;
+  }
+
+  .stat-card,
+  .panel {
+    padding: 16px;
+  }
+}
+
+.btn-coffee {
+  background-color: #6f4e37;
+  border-color: #6f4e37;
+  color: #fff;
+}
+
+.btn-coffee:hover {
+  background-color: #563b2a;
+  border-color: #563b2a;
+  color: #fff;
+}

@@ -1,0 +1,99 @@
+
+<%- include('partials/header', { title: 'Detail Transaksi', user }) %>
+
+<div class="page-heading mb-4">
+  <div>
+    <p class="text-muted mb-1">TITIK TEMU KOPI</p>
+    <h2 class="fw-bold mb-1">Detail Transaksi</h2>
+    <p class="text-muted mb-0">
+      Invoice: <%= order.invoice_number %>
+    </p>
+  </div>
+  <a href="/riwayat-transaksi" class="btn btn-outline-secondary">
+    Kembali
+  </a>
+</div>
+
+<div class="content-card mb-4">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <small class="text-muted">Tanggal Transaksi</small>
+      <p class="fw-semibold">
+        <%= new Date(order.created_at).toLocaleString('id-ID') %>
+      </p>
+    </div>
+    <div class="col-md-6">
+      <small class="text-muted">Status</small>
+      <p class="fw-semibold"><%= order.status %></p>
+    </div>
+    <div class="col-md-6">
+      <small class="text-muted">Tipe Pesanan</small>
+      <p class="fw-semibold"><%= order.tipe_pesanan %></p>
+    </div>
+    <div class="col-md-6">
+      <small class="text-muted">Metode Pembayaran</small>
+      <p class="fw-semibold"><%= order.metode_bayar %></p>
+    </div>
+  </div>
+</div>
+
+<div class="content-card">
+  <h5 class="fw-bold mb-3">Produk yang Dibeli</h5>
+
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Produk</th>
+          <th>Harga</th>
+          <th>Jumlah</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% items.forEach(item => { %>
+          <tr>
+            <td><%= item.nama_produk %></td>
+            <td>Rp <%= Number(item.harga_satuan).toLocaleString('id-ID') %></td>
+            <td><%= item.kuantiti %></td>
+            <td>Rp <%= Number(item.subtotal_baris).toLocaleString('id-ID') %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <hr>
+
+  <div class="row justify-content-end">
+    <div class="col-md-5">
+      <div class="d-flex justify-content-between mb-2">
+        <span>Subtotal</span>
+        <span>Rp <%= Number(order.total_subtotal).toLocaleString('id-ID') %></span>
+      </div>
+      <div class="d-flex justify-content-between mb-2">
+        <span>Diskon</span>
+        <span>Rp <%= Number(order.diskon_nominal).toLocaleString('id-ID') %></span>
+      </div>
+      <div class="d-flex justify-content-between mb-2">
+        <span>PB1</span>
+        <span>Rp <%= Number(order.pajak_nominal).toLocaleString('id-ID') %></span>
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between fw-bold fs-5">
+        <span>Total</span>
+        <span>Rp <%= Number(order.grand_total).toLocaleString('id-ID') %></span>
+      </div>
+      <div class="d-flex justify-content-between mt-2">
+        <span>Uang Dibayar</span>
+        <span>Rp <%= Number(order.uang_dibayar).toLocaleString('id-ID') %></span>
+      </div>
+      <div class="d-flex justify-content-between mt-2">
+        <span>Kembalian</span>
+        <span>Rp <%= Number(order.uang_kembali).toLocaleString('id-ID') %></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

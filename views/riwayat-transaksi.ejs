@@ -1,0 +1,96 @@
+
+<%- include('partials/header', { title: 'Riwayat Transaksi', user }) %>
+
+<div class="page-heading mb-4">
+  <div>
+    <p class="text-muted mb-1">TITIK TEMU KOPI</p>
+    <h2 class="fw-bold mb-1">Riwayat Transaksi</h2>
+    <p class="text-muted mb-0">Daftar transaksi yang kamu proses.</p>
+  </div>
+</div>
+
+<div class="content-card">
+  <div class="mb-3">
+    <input
+      type="search"
+      id="searchTransaction"
+      class="form-control"
+      placeholder="Cari invoice atau metode pembayaran..."
+    >
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Invoice</th>
+          <th>Tanggal</th>
+          <th>Tipe Pesanan</th>
+          <th>Pembayaran</th>
+          <th>Status</th>
+          <th>Total</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody id="transactionList">
+        <% if (transactions.length === 0) { %>
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">
+              Belum ada transaksi.
+            </td>
+          </tr>
+        <% } %>
+
+        <% transactions.forEach(transaction => { %>
+          <tr class="transaction-row">
+            <td class="fw-semibold">
+              <%= transaction.invoice_number %>
+            </td>
+            <td>
+              <%= new Date(transaction.created_at).toLocaleString('id-ID') %>
+            </td>
+            <td>
+              <%= transaction.tipe_pesanan %>
+              <% if (transaction.nomor_meja) { %>
+                <small class="text-muted">
+                  (Meja <%= transaction.nomor_meja %>)
+                </small>
+              <% } %>
+            </td>
+            <td><%= transaction.metode_bayar %></td>
+            <td>
+              <span class="badge <%= transaction.status === 'Selesai' ? 'text-bg-success' : transaction.status === 'Dibatalkan' ? 'text-bg-danger' : 'text-bg-warning' %>">
+                <%= transaction.status %>
+              </span>
+            </td>
+            <td class="fw-semibold">
+              Rp <%= Number(transaction.grand_total).toLocaleString('id-ID') %>
+            </td>
+            <td>
+              <a
+                href="/riwayat-transaksi/<%= transaction.id %>"
+                class="btn btn-outline-success btn-sm"
+              >
+                Detail
+              </a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.getElementById('searchTransaction').addEventListener('input', function () {
+    const keyword = this.value.toLowerCase();
+
+    document.querySelectorAll('.transaction-row').forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(keyword)
+        ? ''
+        : 'none';
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

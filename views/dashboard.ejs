@@ -1,0 +1,304 @@
+<%- include('partials/header', { title: 'Dashboard', user }) %>
+
+<section class="page-heading mb-4">
+  <div>
+    <p class="text-muted mb-1">RINGKASAN BISNIS</p>
+    <h2 class="fw-bold mb-1">Dashboard</h2>
+    <p class="text-muted mb-0">
+      Selamat datang, <%= user.nama_lengkap %>! Berikut ringkasan kafe hari ini.
+    </p>
+  </div>
+  <div class="text-muted small">
+    <i class="bi bi-calendar3 me-1"></i>
+    <%= new Date().toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    }) %>
+  </div>
+</section>
+
+<!-- Statistik -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="stat-card h-100">
+      <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+      <p class="stat-label">Omzet Hari Ini</p>
+      <h4>Rp <%= Number(stats.omzet).toLocaleString('id-ID') %></h4>
+      <small class="text-muted">Total penjualan hari ini</small>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="stat-card h-100">
+      <div class="stat-icon"><i class="bi bi-wallet2"></i></div>
+      <p class="stat-label">Total Omzet Keseluruhan</p>
+      <h4>Rp <%= Number(totalOmzet).toLocaleString('id-ID') %></h4>
+      <small class="text-muted">Akumulasi penjualan yang valid</small>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="stat-card h-100">
+      <div class="stat-icon"><i class="bi bi-receipt"></i></div>
+      <p class="stat-label">Transaksi Hari Ini</p>
+      <h4><%= stats.totalTransaksi %></h4>
+      <small class="text-muted">Transaksi berhasil hari ini</small>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="stat-card h-100">
+      <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+      <p class="stat-label">Rata-rata Transaksi</p>
+      <h4>Rp <%= Number(stats.rataRata).toLocaleString('id-ID') %></h4>
+      <small class="text-muted">Rata-rata nilai transaksi</small>
+    </div>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="stat-card h-100">
+      <div class="stat-icon"><i class="bi bi-cup-hot"></i></div>
+      <p class="stat-label">Total Produk</p>
+      <h4><%= stats.totalProduk %></h4>
+      <small class="text-muted">Produk terdaftar</small>
+    </div>
+  </div>
+</div>
+
+<!-- Grafik penjualan dan aksi cepat -->
+<div class="row g-4 mb-4">
+  <div class="col-12 col-xl-8">
+    <div class="content-card h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h5 class="fw-bold mb-1">Grafik Penjualan</h5>
+          <p class="text-muted small mb-0">Omzet berdasarkan jam hari ini</p>
+        </div>
+        <span class="badge rounded-pill text-bg-light">Hari ini</span>
+      </div>
+
+      <div style="height: 280px;">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-4">
+    <div class="content-card h-100">
+      <h5 class="fw-bold mb-1">Aksi Cepat</h5>
+      <p class="text-muted small mb-4">Akses fitur utama aplikasi</p>
+
+      <a href="/pos" class="quick-action">
+        <span class="quick-action-icon">
+          <i class="bi bi-cart-plus"></i>
+        </span>
+        <span>
+          <strong>Transaksi Baru</strong>
+          <small>Buat pesanan pelanggan</small>
+        </span>
+        <i class="bi bi-chevron-right ms-auto"></i>
+      </a>
+
+      <a href="/orders" class="quick-action">
+        <span class="quick-action-icon">
+          <i class="bi bi-clock-history"></i>
+        </span>
+        <span>
+          <strong>Riwayat Transaksi</strong>
+          <small>Lihat pesanan sebelumnya</small>
+        </span>
+        <i class="bi bi-chevron-right ms-auto"></i>
+      </a>
+
+      <% if (user.role === 'admin') { %>
+        <a href="/products" class="quick-action">
+          <span class="quick-action-icon">
+            <i class="bi bi-box-seam"></i>
+          </span>
+          <span>
+            <strong>Kelola Produk</strong>
+            <small>Atur menu dan stok</small>
+          </span>
+          <i class="bi bi-chevron-right ms-auto"></i>
+        </a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Menu terlaris dan stok rendah -->
+<div class="row g-4 mb-4">
+  <div class="col-12 col-xl-6">
+    <div class="content-card h-100">
+      <h5 class="fw-bold mb-1">Menu Terlaris</h5>
+      <p class="text-muted small mb-3">
+        5 produk dengan penjualan tertinggi
+      </p>
+
+      <% if (bestSelling.length === 0) { %>
+        <div class="text-center text-muted py-4">
+          <i class="bi bi-cup-hot fs-3 d-block mb-2"></i>
+          Belum ada data penjualan.
+        </div>
+      <% } else { %>
+        <% bestSelling.forEach((item, index) => { %>
+          <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+            <div>
+              <span class="badge text-bg-light me-2">
+                <%= index + 1 %>
+              </span>
+              <strong><%= item.nama_produk %></strong>
+            </div>
+            <span class="text-muted">
+              <%= item.total_terjual %> terjual
+            </span>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-6">
+    <div class="content-card h-100">
+      <h5 class="fw-bold mb-1">Peringatan Stok Rendah</h5>
+      <p class="text-muted small mb-3">
+        Produk dengan stok 5 atau kurang
+      </p>
+
+      <% if (lowStock.length === 0) { %>
+        <div class="text-center text-muted py-4">
+          <i class="bi bi-check-circle fs-3 d-block mb-2"></i>
+          Tidak ada produk dengan stok rendah.
+        </div>
+      <% } else { %>
+        <% lowStock.forEach(item => { %>
+          <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+            <div>
+              <strong><%= item.nama_produk %></strong>
+              <div class="small text-muted">
+                Segera periksa ketersediaan produk
+              </div>
+            </div>
+            <span class="badge text-bg-danger">
+              Stok: <%= item.stok %> <%= item.unit || '' %>
+            </span>
+          </div>
+        <% }) %>
+      <% } %>
+
+      <% if (user.role === 'admin') { %>
+        <a href="/products" class="btn btn-outline-success btn-sm mt-3">
+          Kelola Produk
+        </a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Transaksi terbaru -->
+<div class="content-card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h5 class="fw-bold mb-1">Transaksi Terbaru</h5>
+      <p class="text-muted small mb-0">
+        Aktivitas penjualan terakhir
+      </p>
+    </div>
+    <a href="/orders" class="btn btn-outline-success btn-sm">
+      Lihat Semua
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>No. Invoice</th>
+          <th>Kasir</th>
+          <th>Waktu</th>
+          <th>Pembayaran</th>
+          <th>Status</th>
+          <th class="text-end">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (recentOrders.length === 0) { %>
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+              <i class="bi bi-receipt fs-3 d-block mb-2"></i>
+              Belum ada transaksi.
+            </td>
+          </tr>
+        <% } else { %>
+          <% recentOrders.forEach(order => { %>
+            <tr>
+              <td class="fw-semibold">
+                <%= order.invoice_number %>
+              </td>
+              <td><%= order.nama_lengkap || '-' %></td>
+              <td>
+                <%= new Date(order.created_at).toLocaleString('id-ID', {
+                  day: '2-digit',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                }) %>
+              </td>
+              <td><%= order.metode_bayar || '-' %></td>
+              <td>
+                <span class="badge rounded-pill <%= order.status === 'Selesai' ? 'text-bg-success' : 'text-bg-secondary' %>">
+                  <%= order.status %>
+                </span>
+              </td>
+              <td class="text-end fw-semibold">
+                Rp <%= Number(order.grand_total).toLocaleString('id-ID') %>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Grafik Chart.js -->
+<script>
+  const chartLabels = <%- JSON.stringify(chartLabels) %>;
+  const chartData = <%- JSON.stringify(chartData) %>;
+
+  new Chart(document.getElementById('salesChart'), {
+    type: 'line',
+    data: {
+      labels: chartLabels,
+      datasets: [{
+        label: 'Omzet (Rp)',
+        data: chartData,
+        borderColor: '#47785b',
+        backgroundColor: 'rgba(71, 120, 91, 0.12)',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 4,
+        pointBackgroundColor: '#47785b'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: value =>
+              'Rp ' + Number(value).toLocaleString('id-ID')
+          }
+        }
+      }
+    }
+  });
+</script>
+
+<%- include('partials/footer') %>

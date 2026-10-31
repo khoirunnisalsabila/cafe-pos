@@ -1,0 +1,139 @@
+<%- include('partials/header', { title: 'Transaksi POS', user }) %>
+
+<div class="page-heading mb-4">
+  <div>
+    <p class="text-muted mb-1">TITIK TEMU KOPI</p>
+    <h2 class="fw-bold mb-1">Transaksi POS</h2>
+    <p class="text-muted mb-0">Pilih produk untuk memulai pesanan.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-12 col-lg-8">
+    <div class="content-card">
+      <input
+        type="search"
+        id="searchProduct"
+        class="form-control mb-3"
+        placeholder="Cari nama produk..."
+      >
+
+      <div class="row g-3" id="productList">
+        <% if (products.length === 0) { %>
+          <div class="col-12 text-center text-muted py-5">
+            Belum ada produk tersedia atau stok habis.
+          </div>
+        <% } %>
+
+        <% products.forEach(product => { %>
+          <div
+            class="col-12 col-sm-6 col-xl-4 product-item"
+            data-name="<%= product.nama_produk %>"
+          >
+            <div class="border rounded-3 p-3 h-100">
+              <span class="badge text-bg-light mb-2">
+                <%= product.nama_kategori || 'Menu' %>
+              </span>
+
+              <h6 class="fw-bold"><%= product.nama_produk %></h6>
+
+              <p class="text-success fw-semibold mb-1">
+                Rp <%= Number(product.harga).toLocaleString('id-ID') %>
+              </p>
+
+              <small class="text-muted d-block mb-3">
+                Stok: <%= product.stok %>
+              </small>
+
+              <button
+                type="button"
+                class="btn btn-success btn-sm w-100 add-product"
+                data-id="<%= product.id %>"
+                data-name="<%= product.nama_produk %>"
+                data-price="<%= product.harga %>"
+                data-stock="<%= product.stok %>"
+              >
+                <i class="bi bi-plus-lg me-1"></i> Tambah
+              </button>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="content-card">
+      <h5 class="fw-bold mb-3">
+        <i class="bi bi-cart3 me-2"></i>Pesanan
+      </h5>
+
+      <div id="cartItems" class="mb-3">
+        <p class="text-muted text-center py-3" id="emptyCart">
+          Belum ada produk dipilih.
+        </p>
+      </div>
+
+      <hr>
+
+      <div class="d-flex justify-content-between mb-3">
+        <strong>Total</strong>
+        <strong id="cartTotal">Rp 0</strong>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Tipe Pesanan</label>
+        <select class="form-select" id="orderType">
+          <option value="Take Away">Take Away</option>
+          <option value="Dine In">Dine In</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Metode Pembayaran</label>
+        <select class="form-select" id="paymentMethod">
+          <option value="Tunai">Tunai</option>
+          <option value="QRIS">QRIS</option>
+          <option value="Transfer">Transfer</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Diskon (Rp)</label>
+        <input
+          type="number"
+          class="form-control"
+          id="discount"
+          min="0"
+          value="0"
+        >
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">PB1 (10%)</label>
+        <p class="fw-semibold mb-0" id="taxAmount">Rp 0</p>
+      </div>
+
+      <div class="mb-3" id="cashSection">
+        <label class="form-label">Uang Dibayar (Rp)</label>
+        <input
+          type="number"
+          class="form-control"
+          id="cashReceived"
+          min="0"
+          value="0"
+        >
+        <small class="text-muted">
+          Kembalian: <strong id="changeAmount">Rp 0</strong>
+        </small>
+      </div>
+
+      <button type="button" class="btn btn-success w-100" id="checkoutBtn">
+        <i class="bi bi-check-circle me-1"></i> Proses Transaksi
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/pos.js"></script>
+<%- include('partials/footer') %>

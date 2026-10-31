@@ -1,0 +1,213 @@
+<%- include('partials/header') %>
+
+<div class="container-fluid py-3">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <h2 class="h4 mb-1">Produk &amp; Stok</h2>
+      <p class="text-muted mb-0">Kelola menu, harga, kategori, dan persediaan produk.</p>
+    </div>
+    <button class="btn btn-coffee" data-bs-toggle="modal" data-bs-target="#addProductModal">
+      <i class="bi bi-plus-lg me-1"></i> Tambah Produk
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <input type="search" id="productSearch" class="form-control" placeholder="Cari kode atau nama produk...">
+        </div>
+        <div class="col-md-3">
+          <select id="stockFilter" class="form-select">
+            <option value="all">Semua stok</option>
+            <option value="low">Stok menipis (≤ 5)</option>
+            <option value="empty">Stok habis</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Nama Produk</th>
+              <th>Kategori</th>
+              <th>Harga Pokok</th>
+              <th>Harga Jual</th>
+              <th>Stok</th>
+              <th>Satuan</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="productTable">
+            <% products.forEach(product => { %>
+              <tr data-search="<%= (product.kode_produk + ' ' + product.nama_produk + ' ' + (product.nama_kategori || '')).toLowerCase() %>" data-stock="<%= product.stok %>">
+                <td><%= product.kode_produk %></td>
+                <td class="fw-semibold"><%= product.nama_produk %></td>
+                <td><%= product.nama_kategori || '-' %></td>
+                <td>Rp <%= Number(product.harga_pokok).toLocaleString('id-ID') %></td>
+                <td>Rp <%= Number(product.harga_jual).toLocaleString('id-ID') %></td>
+                <td>
+                  <% if (product.stok === 0) { %>
+                    <span class="badge text-bg-danger">Habis</span>
+                  <% } else if (product.stok <= 5) { %>
+                    <span class="badge text-bg-warning"><%= product.stok %></span>
+                  <% } else { %>
+                    <span class="badge text-bg-success"><%= product.stok %></span>
+                  <% } %>
+                </td>
+                <td><%= product.unit %></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary mb-1" data-bs-toggle="modal" data-bs-target="#editProduct<%= product.id %>">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <form action="/products/<%= product.id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger mb-1">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+
+              <div class="modal fade" id="editProduct<%= product.id %>" tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                  <div class="modal-content">
+                    <form action="/products/<%= product.id %>/update" method="POST">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Edit Produk</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="row g-3">
+                          <div class="col-md-6">
+                            <label class="form-label">Kode Produk</label>
+                            <input name="kode_produk" class="form-control" value="<%= product.kode_produk %>" required>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Nama Produk</label>
+                            <input name="nama_produk" class="form-control" value="<%= product.nama_produk %>" required>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Kategori</label>
+                            <select name="category_id" class="form-select" required>
+                              <% categories.forEach(category => { %>
+                                <option value="<%= category.id %>" <%= Number(product.category_id) === Number(category.id) ? 'selected' : '' %>><%= category.nama_kategori %></option>
+                              <% }) %>
+                            </select>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Satuan</label>
+                            <input name="unit" class="form-control" value="<%= product.unit %>" required>
+                          </div>
+                          <div class="col-md-4">
+                            <label class="form-label">Harga Pokok</label>
+                            <input type="number" name="harga_pokok" class="form-control" min="0" value="<%= product.harga_pokok %>" required>
+                          </div>
+                          <div class="col-md-4">
+                            <label class="form-label">Harga Jual</label>
+                            <input type="number" name="harga_jual" class="form-control" min="0" value="<%= product.harga_jual %>" required>
+                          </div>
+                          <div class="col-md-4">
+                            <label class="form-label">Stok</label>
+                            <input type="number" name="stok" class="form-control" min="0" step="1" value="<%= product.stok %>" required>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-coffee">Simpan Perubahan</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+            <% if (products.length === 0) { %>
+              <tr><td colspan="8" class="text-center text-muted py-4">Belum ada produk.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addProductModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form action="/products/add" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title">Tambah Produk</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Kode Produk</label>
+              <input name="kode_produk" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nama Produk</label>
+              <input name="nama_produk" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Kategori</label>
+              <select name="category_id" class="form-select" required>
+                <option value="">Pilih kategori</option>
+                <% categories.forEach(category => { %>
+                  <option value="<%= category.id %>"><%= category.nama_kategori %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Satuan</label>
+              <input name="unit" class="form-control" value="pcs" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Harga Pokok</label>
+              <input type="number" name="harga_pokok" class="form-control" min="0" value="0" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Harga Jual</label>
+              <input type="number" name="harga_jual" class="form-control" min="0" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Stok Awal</label>
+              <input type="number" name="stok" class="form-control" min="0" step="1" value="0" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan Produk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+const productSearch = document.getElementById('productSearch');
+const stockFilter = document.getElementById('stockFilter');
+
+function filterProducts() {
+  const query = productSearch.value.toLowerCase();
+  const filter = stockFilter.value;
+
+  document.querySelectorAll('#productTable tr[data-search]').forEach(row => {
+    const matchesSearch = row.dataset.search.includes(query);
+    const stock = Number(row.dataset.stock);
+    const matchesStock = filter === 'all' ||
+      (filter === 'low' && stock > 0 && stock <= 5) ||
+      (filter === 'empty' && stock === 0);
+
+    row.style.display = matchesSearch && matchesStock ? '' : 'none';
+  });
+}
+
+productSearch.addEventListener('input', filterProducts);
+stockFilter.addEventListener('change', filterProducts);
+</script>
+
+<%- include('partials/footer') %>

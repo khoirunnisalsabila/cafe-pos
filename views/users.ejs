@@ -1,0 +1,200 @@
+
+<%- include('partials/header') %>
+
+<div class="container-fluid py-3">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+      <h2 class="h4 mb-1">Manajemen Pengguna</h2>
+      <p class="text-muted mb-0">Kelola akun administrator dan kasir.</p>
+    </div>
+    <button class="btn btn-coffee" data-bs-toggle="modal" data-bs-target="#addUserModal">
+      <i class="bi bi-person-plus me-1"></i> Tambah Pengguna
+    </button>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <input type="search" id="userSearch" class="form-control" placeholder="Cari nama atau username...">
+        </div>
+        <div class="col-md-3">
+          <select id="roleFilter" class="form-select">
+            <option value="all">Semua role</option>
+            <option value="admin">Administrator</option>
+            <option value="kasir">Kasir</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select id="statusFilter" class="form-select">
+            <option value="all">Semua status</option>
+            <option value="active">Aktif</option>
+            <option value="inactive">Nonaktif</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Nama Lengkap</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Tanggal Dibuat</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="userTable">
+            <% users.forEach(item => { %>
+              <tr
+                data-search="<%= (item.nama_lengkap + ' ' + item.username).toLowerCase() %>"
+                data-role="<%= item.role %>"
+                data-status="<%= item.status %>">
+                <td class="fw-semibold"><%= item.nama_lengkap %></td>
+                <td><%= item.username %></td>
+                <td>
+                  <span class="badge <%= item.role === 'admin' ? 'text-bg-dark' : 'text-bg-secondary' %>">
+                    <%= item.role === 'admin' ? 'Administrator' : 'Kasir' %>
+                  </span>
+                </td>
+                <td>
+                  <span class="badge <%= item.status === 'active' ? 'text-bg-success' : 'text-bg-danger' %>">
+                    <%= item.status === 'active' ? 'Aktif' : 'Nonaktif' %>
+                  </span>
+                </td>
+                <td><%= new Date(item.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-secondary mb-1" data-bs-toggle="modal" data-bs-target="#editUser<%= item.id %>">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <% if (Number(item.id) !== Number(user.id)) { %>
+                    <form action="/users/<%= item.id %>/status" method="POST" class="d-inline">
+                      <input type="hidden" name="status" value="<%= item.status === 'active' ? 'inactive' : 'active' %>">
+                      <button type="submit" class="btn btn-sm <%= item.status === 'active' ? 'btn-outline-danger' : 'btn-outline-success' %> mb-1" onclick="return confirm('Yakin ingin mengubah status akun ini?')">
+                        <i class="bi <%= item.status === 'active' ? 'bi-person-slash' : 'bi-person-check' %>"></i>
+                      </button>
+                    </form>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+            <% if (users.length === 0) { %>
+              <tr><td colspan="6" class="text-center text-muted py-4">Belum ada pengguna.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% users.forEach(item => { %>
+  <div class="modal fade" id="editUser<%= item.id %>" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form action="/users/<%= item.id %>/update" method="POST">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Pengguna</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input class="form-control" value="<%= item.username %>" disabled>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Nama Lengkap</label>
+              <input name="nama_lengkap" class="form-control" value="<%= item.nama_lengkap %>" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Role</label>
+              <select name="role" class="form-select" <%= Number(item.id) === Number(user.id) ? 'disabled' : '' %>>
+                <option value="admin" <%= item.role === 'admin' ? 'selected' : '' %>>Administrator</option>
+                <option value="kasir" <%= item.role === 'kasir' ? 'selected' : '' %>>Kasir</option>
+              </select>
+              <% if (Number(item.id) === Number(user.id)) { %>
+                <input type="hidden" name="role" value="admin">
+                <small class="text-muted">Role akun yang sedang digunakan tidak dapat diubah.</small>
+              <% } %>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Password Baru</label>
+              <input type="password" name="password" class="form-control" minlength="8" autocomplete="new-password" placeholder="Kosongkan jika tidak ingin mengubah">
+              <small class="text-muted">Minimal 8 karakter jika ingin mengganti password.</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-coffee">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<% }) %>
+
+<div class="modal fade" id="addUserModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="/users/add" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title">Tambah Pengguna</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nama Lengkap</label>
+            <input name="nama_lengkap" class="form-control" required maxlength="100">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input name="username" class="form-control" required maxlength="50" autocomplete="username">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select name="role" class="form-select" required>
+              <option value="kasir">Kasir</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" required minlength="8" autocomplete="new-password">
+            <small class="text-muted">Minimal 8 karakter.</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-coffee">Simpan Pengguna</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+const userSearch = document.getElementById('userSearch');
+const roleFilter = document.getElementById('roleFilter');
+const statusFilter = document.getElementById('statusFilter');
+
+function filterUsers() {
+  const query = userSearch.value.toLowerCase();
+  const role = roleFilter.value;
+  const status = statusFilter.value;
+
+  document.querySelectorAll('#userTable tr[data-search]').forEach(row => {
+    const matchesSearch = row.dataset.search.includes(query);
+    const matchesRole = role === 'all' || row.dataset.role === role;
+    const matchesStatus = status === 'all' || row.dataset.status === status;
+    row.style.display = matchesSearch && matchesRole && matchesStatus ? '' : 'none';
+  });
+}
+
+userSearch.addEventListener('input', filterUsers);
+roleFilter.addEventListener('change', filterUsers);
+statusFilter.addEventListener('change', filterUsers);
+</script>
+
+<%- include('partials/footer') %>
